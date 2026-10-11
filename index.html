@@ -7,15 +7,14 @@
     <meta name="description" content="A refracting glass band at the top of the window, built with backdrop-filter and an SVG filter. Scroll to see it, tweak it in the panel." />
     <link rel="stylesheet" href="demo/demo.css" />
     <style>
-      /* The bar floats just below the glass edge, so it stays readable and
-         reachable while scrolling. --edge-height follows the band height. */
+      /* The bar sits at the bottom of the window, next to the settings panel,
+         so the glass edge at the top never covers it. */
       .topbar.floating {
         position: fixed;
-        top: calc(var(--edge-height, 100px) + 12px);
-        left: 50%;
+        bottom: 16px;
+        left: 16px;
+        right: 352px;
         z-index: 40;
-        width: min(1072px, calc(100vw - 32px));
-        translate: -50% 0;
         padding: 12px 18px;
         border: 1px solid var(--line);
         border-radius: 999px;
@@ -24,8 +23,19 @@
         backdrop-filter: blur(12px);
       }
 
+      @media (max-width: 700px) {
+        .topbar.floating {
+          right: 16px;
+        }
+
+        /* Panel moves up above the bar on small screens. */
+        .panel {
+          bottom: 76px;
+        }
+      }
+
       .hero {
-        padding: calc(18vh + 80px) 0 12vh;
+        padding: 18vh 0 12vh;
       }
 
       .hero h1 {
@@ -148,7 +158,7 @@
       }
 
       footer {
-        padding: 48px 0 140px;
+        padding: 48px 0 160px;
         color: var(--muted);
       }
     </style>
@@ -260,7 +270,6 @@
       const mirrorSliders = document.querySelector('[data-mirror-sliders]')
 
       const show = (o) => {
-        document.documentElement.style.setProperty('--edge-height', `${edge.supported ? o.height : Math.round(o.height * 0.7)}px`)
         for (const [key, { input, out, d }] of inputs) {
           input.value = o[key]
           out.textContent = d.format(o[key])
