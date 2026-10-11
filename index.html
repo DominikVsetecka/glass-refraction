@@ -118,8 +118,8 @@
       }
 
       .stripes {
-        height: 360px;
-        margin: 96px 0;
+        height: 1080px;
+        margin: 0 0 96px;
         border-radius: 20px;
         background: repeating-linear-gradient(0deg, #f4f0ea 0 2px, transparent 2px 22px), repeating-linear-gradient(90deg, #f4f0ea 0 2px, #151515 2px 44px);
         opacity: 0.9;
@@ -144,6 +144,8 @@
         <p class="hint mono">↓ Scroll · settings bottom right</p>
       </header>
 
+      <div class="stripes" aria-hidden="true"></div>
+
       <ul class="rows">
         <li><span>Band height</span><span>100 px</span></li>
         <li><span>Fan drift</span><span>2.5 %</span></li>
@@ -167,8 +169,6 @@
         <h2>Browser support</h2>
         <p>SVG filters inside <code>backdrop-filter</code> only render in Chromium-based browsers. Safari and Firefox get a frosted blur instead. If you're reading this in one of them, try Chrome to see the real thing.</p>
       </article>
-
-      <div class="stripes" aria-hidden="true"></div>
 
       <ul class="rows">
         <li><span>Smooth, not stepped</span><span>01</span></li>
