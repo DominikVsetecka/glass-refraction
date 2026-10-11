@@ -36,6 +36,11 @@
         border-top: 1px solid var(--line);
       }
 
+      .values-label {
+        margin: 0 0 14px;
+        color: var(--accent);
+      }
+
       .rows li {
         display: flex;
         justify-content: space-between;
@@ -146,12 +151,13 @@
 
       <div class="stripes" aria-hidden="true"></div>
 
+      <p class="values-label mono" data-values-label>Default values · they follow the settings panel</p>
       <ul class="rows">
-        <li><span>Band height</span><span>100 px</span></li>
-        <li><span>Fan drift</span><span>2.5 %</span></li>
-        <li><span>Colour fringe</span><span>4 %</span></li>
-        <li><span>Softness</span><span>1.1</span></li>
-        <li><span>Mirror zone</span><span>20 %</span></li>
+        <li><span>Band height</span><span data-value="height">100 px</span></li>
+        <li><span>Fan drift</span><span data-value="drift">2.5 %</span></li>
+        <li><span>Colour fringe</span><span data-value="chroma">4 %</span></li>
+        <li><span>Softness</span><span data-value="softness">1.1</span></li>
+        <li><span>Mirror zone</span><span data-value="mirrorHeight">20 %</span></li>
       </ul>
 
       <div class="tiles">
@@ -243,6 +249,16 @@
         }
         mirrorBox.checked = o.mirror
         mirrorSliders.hidden = !o.mirror
+
+        // The value rows on the page follow the panel.
+        for (const el of document.querySelectorAll('[data-value]')) {
+          const key = el.dataset.value
+          el.textContent = key === 'mirrorHeight' && !o.mirror ? 'off' : inputs.get(key).d.format(o[key])
+        }
+        const changed = Object.keys(defaults).some((k) => defaults[k] !== o[k])
+        document.querySelector('[data-values-label]').textContent = changed
+          ? 'Your values · reset in the settings panel'
+          : 'Default values · they follow the settings panel'
       }
 
       // Rebuilding the maps takes a few ms: at most once per frame.
