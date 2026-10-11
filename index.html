@@ -7,8 +7,25 @@
     <meta name="description" content="A refracting glass band at the top of the window, built with backdrop-filter and an SVG filter. Scroll to see it, tweak it in the panel." />
     <link rel="stylesheet" href="demo/demo.css" />
     <style>
+      /* The bar floats just below the glass edge, so it stays readable and
+         reachable while scrolling. --edge-height follows the band height. */
+      .topbar.floating {
+        position: fixed;
+        top: calc(var(--edge-height, 100px) + 12px);
+        left: 50%;
+        z-index: 40;
+        width: min(1072px, calc(100vw - 32px));
+        translate: -50% 0;
+        padding: 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgb(13 13 13 / 0.72);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+      }
+
       .hero {
-        padding: 18vh 0 12vh;
+        padding: calc(18vh + 80px) 0 12vh;
       }
 
       .hero h1 {
@@ -138,7 +155,7 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topbar mono" aria-label="Demos">
+      <nav class="topbar floating mono" aria-label="Demos">
         <span>Glass Refraction</span>
         <span><a href="./" aria-current="page">Scroll edge</a> · <a href="rod.html">Glass rod</a></span>
       </nav>
@@ -243,6 +260,7 @@
       const mirrorSliders = document.querySelector('[data-mirror-sliders]')
 
       const show = (o) => {
+        document.documentElement.style.setProperty('--edge-height', `${edge.supported ? o.height : Math.round(o.height * 0.7)}px`)
         for (const [key, { input, out, d }] of inputs) {
           input.value = o[key]
           out.textContent = d.format(o[key])
