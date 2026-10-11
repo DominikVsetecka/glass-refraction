@@ -7,8 +7,32 @@
     <meta name="description" content="A glass rod floating over a canvas, as a small WebGL shader. Lens, peak, drift, fringe and blur, with sliders." />
     <link rel="stylesheet" href="demo/demo.css" />
     <style>
+      /* Same bottom bar as the scroll demo. */
+      .topbar.floating {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        z-index: 40;
+        padding: 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgb(13 13 13 / 0.72);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+      }
+
+      @media (max-width: 700px) {
+        .topbar.floating {
+          padding: 12px 14px;
+          font-size: 10px;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
+        }
+      }
+
       main {
-        padding: 6vh 0 80px;
+        padding: 10vh 0 120px;
       }
 
       h1 {
@@ -80,7 +104,7 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topbar mono" aria-label="Demos">
+      <nav class="topbar floating mono" aria-label="Demos">
         <span>Glass Refraction</span>
         <span><a href="./">Scroll edge</a> · <a href="rod.html" aria-current="page">Glass rod</a></span>
       </nav>
