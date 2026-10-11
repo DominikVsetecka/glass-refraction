@@ -3,8 +3,12 @@
 # ES modules don't load from file://, so the pages need a server.
 cd "$(dirname "$0")" || exit 1
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 not found. Install it (e.g. xcode-select --install) and try again."
+# macOS ships a /usr/bin/python3 stub even without Python, so check that it
+# actually runs instead of only checking that the command exists.
+if ! python3 -c 'pass' >/dev/null 2>&1; then
+  echo "Python 3 is needed to serve the demos locally."
+  echo "Install it with: xcode-select --install   (Apple Command Line Tools)"
+  echo "or from https://www.python.org/downloads/ and try again."
   exit 1
 fi
 
