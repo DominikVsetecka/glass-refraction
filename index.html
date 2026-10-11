@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Glass Edge · Scroll demo</title>
+    <meta name="description" content="A refracting glass band at the top of the window, built with backdrop-filter and an SVG filter. Scroll to see it, tweak it in the panel." />
+    <link rel="stylesheet" href="demo/demo.css" />
+    <style>
+      .hero {
+        padding: 18vh 0 12vh;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(56px, 11vw, 168px);
+        font-weight: 600;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        max-width: 560px;
+        margin: 28px 0 0;
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .hint {
+        margin-top: 48px;
+        color: var(--accent);
+      }
+
+      .rows {
+        border-top: 1px solid var(--line);
+      }
+
+      .rows li {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 24px;
+        padding: 22px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: clamp(28px, 4.4vw, 60px);
+        font-weight: 500;
+        letter-spacing: -0.02em;
+      }
+
+      .rows li span:last-child {
+        color: var(--muted);
+      }
+
+      .rows {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin: 96px 0;
+      }
+
+      .tile {
+        aspect-ratio: 4 / 5;
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: flex-end;
+        color: #000;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      .tile:nth-child(1) {
+        background: linear-gradient(160deg, #dffd02, #4ade80 60%, #0ea5e9);
+      }
+
+      .tile:nth-child(2) {
+        background: linear-gradient(200deg, #ff6b4a, #ff2d95 55%, #7c3aed);
+        color: #fff;
+      }
+
+      .tile:nth-child(3) {
+        background: repeating-linear-gradient(90deg, #f4f0ea 0 14px, #0d0d0d 14px 28px);
+        color: #000;
+      }
+
+      .tile:nth-child(3) span {
+        background: #f4f0ea;
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+
+      .prose {
+        max-width: 680px;
+        margin: 0 auto 120px;
+        font-size: 19px;
+        line-height: 1.65;
+        color: rgb(244 240 234 / 0.82);
+      }
+
+      .prose h2 {
+        margin: 64px 0 12px;
+        font-size: 30px;
+        color: var(--fg);
+        letter-spacing: -0.01em;
+      }
+
+      .prose code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85em;
+        color: var(--accent);
+      }
+
+      .stripes {
+        height: 360px;
+        margin: 96px 0;
+        border-radius: 20px;
+        background: repeating-linear-gradient(0deg, #f4f0ea 0 2px, transparent 2px 22px), repeating-linear-gradient(90deg, #f4f0ea 0 2px, #151515 2px 44px);
+        opacity: 0.9;
+      }
+
+      footer {
+        padding: 48px 0 140px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topbar mono" aria-label="Demos">
+        <span>Glass Refraction</span>
+        <span><a href="./" aria-current="page">Scroll edge</a> · <a href="rod.html">Glass rod</a></span>
+      </nav>
+
+      <header class="hero">
+        <h1>Glass<br />Edge</h1>
+        <p>Scroll and watch the top of the window. The page bends under a glass rod: stretched upwards, spread at the sides, with a soft rainbow fringe.</p>
+        <p class="hint mono">↓ Scroll · settings bottom right</p>
+      </header>
+
+      <ul class="rows">
+        <li><span>Band height</span><span>100 px</span></li>
+        <li><span>Fan drift</span><span>2.5 %</span></li>
+        <li><span>Colour fringe</span><span>4 %</span></li>
+        <li><span>Softness</span><span>1.1</span></li>
+        <li><span>Mirror zone</span><span>20 %</span></li>
+      </ul>
+
+      <div class="tiles">
+        <div class="tile">Lens</div>
+        <div class="tile">Fringe</div>
+        <div class="tile"><span>Steps</span></div>
+      </div>
+
+      <article class="prose">
+        <h2>How it works</h2>
+        <p>A fixed strip at the top of the page uses <code>backdrop-filter: url(#filter)</code>. The SVG filter moves every pixel with <code>feDisplacementMap</code>, guided by a few greyscale images drawn once in a canvas. Mid-grey means "stay", lighter and darker push the pixel up or down.</p>
+        <p>One map stretches vertically (the lens), one spreads sideways (the fan). The vertical pass runs five times, tinted red, yellow, green, cyan and blue. Where they overlap, they add up to white, so only the edges show colour.</p>
+        <h2>Why grey maps</h2>
+        <p>Chrome converts filter images into the colour profile of each screen. A colourful map mixes its channels in that step, so the band tilts differently on every monitor. Grey stays grey everywhere. The second axis reads the alpha channel, and a counter-pass cancels whatever is left.</p>
+        <h2>Browser support</h2>
+        <p>SVG filters inside <code>backdrop-filter</code> only render in Chromium-based browsers. Safari and Firefox get a frosted blur instead. If you're reading this in one of them, try Chrome to see the real thing.</p>
+      </article>
+
+      <div class="stripes" aria-hidden="true"></div>
+
+      <ul class="rows">
+        <li><span>Smooth, not stepped</span><span>01</span></li>
+        <li><span>No seam at the bottom</span><span>02</span></li>
+        <li><span>Same on every screen</span><span>03</span></li>
+      </ul>
+
+      <footer class="mono">
+        Glass Edge by <a href="https://dominikvsetecka.com/lab/glass-edge/">Dominik Vsetecka</a> · MIT licence
+      </footer>
+    </div>
+
+    <details class="panel" open>
+      <summary class="mono">Settings</summary>
+      <div class="panel-body">
+        <p class="note" data-support-note hidden>This browser doesn't render SVG filters in backdrop-filter, so you see the blur fallback. Open the page in Chrome or Edge for the glass.</p>
+        <div class="row" data-presets></div>
+        <div data-sliders></div>
+        <label class="toggle"><input type="checkbox" data-mirror /> Mirror zone</label>
+        <div data-mirror-sliders></div>
+        <hr />
+        <div class="row">
+          <button type="button" data-copy>Copy settings</button>
+          <button type="button" data-reset>Reset</button>
+        </div>
+      </div>
+    </details>
+
+    <script type="module">
+      import { createGlassEdge, defaults, presets } from './src/glass-edge.js'
+
+      const edge = createGlassEdge()
+      document.querySelector('[data-support-note]').hidden = edge.supported
+
+      const pct = (v) => `${Math.round(v * 100)} %`
+      const main = [
+        { key: 'height', label: 'Band height', min: 40, max: 160, step: 2, format: (v) => `${v} px` },
+        { key: 'drift', label: 'Fan drift', min: 0, max: 0.05, step: 0.001, format: (v) => `${(v * 100).toFixed(1)} %` },
+        { key: 'chroma', label: 'Colour fringe', min: 0, max: 0.2, step: 0.005, format: pct },
+        { key: 'softness', label: 'Softness', min: 0, max: 3, step: 0.1, format: (v) => v.toFixed(1) },
+      ]
+      const mirror = [
+        { key: 'mirrorPos', label: 'Mirror position', min: 0, max: 0.4, step: 0.01, format: pct },
+        { key: 'mirrorHeight', label: 'Mirror height', min: 0.1, max: 0.5, step: 0.01, format: pct },
+        { key: 'mirrorTop', label: 'Top row', min: 0.3, max: 1, step: 0.01, format: pct },
+        { key: 'mirrorAxis', label: 'Mirror axis', min: 0, max: 0.95, step: 0.01, format: pct },
+        { key: 'mirrorGap', label: 'Gap after fold', min: 0, max: 0.4, step: 0.01, format: pct },
+      ]
+
+      const inputs = new Map()
+      const build = (defs, host) => {
+        for (const d of defs) {
+          const label = document.createElement('label')
+          const name = document.createElement('span')
+          name.textContent = d.label
+          const out = document.createElement('output')
+          const input = Object.assign(document.createElement('input'), { type: 'range', min: d.min, max: d.max, step: d.step })
+          label.append(name, out, input)
+          host.append(label)
+          inputs.set(d.key, { input, out, d })
+        }
+      }
+      build(main, document.querySelector('[data-sliders]'))
+      build(mirror, document.querySelector('[data-mirror-sliders]'))
+      const mirrorBox = document.querySelector('[data-mirror]')
+      const mirrorSliders = document.querySelector('[data-mirror-sliders]')
+
+      const show = (o) => {
+        for (const [key, { input, out, d }] of inputs) {
+          input.value = o[key]
+          out.textContent = d.format(o[key])
+        }
+        mirrorBox.checked = o.mirror
+        mirrorSliders.hidden = !o.mirror
+      }
+
+      // Rebuilding the maps takes a few ms: at most once per frame.
+      let pending = null
+      const apply = (next) => {
+        pending = { ...(pending || {}), ...next }
+        requestAnimationFrame(() => {
+          if (!pending) return
+          edge.update(pending)
+          pending = null
+          show(edge.options)
+        })
+      }
+
+      for (const [key, { input }] of inputs) input.addEventListener('input', () => apply({ [key]: Number(input.value) }))
+      mirrorBox.addEventListener('change', () => apply({ mirror: mirrorBox.checked }))
+
+      const presetRow = document.querySelector('[data-presets]')
+      for (const [name, values] of Object.entries(presets)) {
+        const b = Object.assign(document.createElement('button'), { type: 'button', textContent: name })
+        b.addEventListener('click', () => apply({ ...defaults, ...values }))
+        presetRow.append(b)
+      }
+
+      document.querySelector('[data-reset]').addEventListener('click', () => apply({ ...defaults }))
+      document.querySelector('[data-copy]').addEventListener('click', async (e) => {
+        const o = edge.options
+        const changed = Object.fromEntries(Object.entries(o).filter(([k, v]) => defaults[k] !== v))
+        const text = `createGlassEdge(${JSON.stringify(changed, null, 2)})`
+        try {
+          await navigator.clipboard.writeText(text)
+          e.target.textContent = 'Copied'
+        } catch {
+          console.log(text)
+          e.target.textContent = 'See console'
+        }
+        setTimeout(() => (e.target.textContent = 'Copy settings'), 1400)
+      })
+
+      // Collapsed by default on small screens.
+      if (matchMedia('(max-width: 640px)').matches) document.querySelector('.panel').open = false
+
+      show(edge.options)
+    </script>
+  </body>
+</html>

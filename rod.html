@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Glass Rod · WebGL demo</title>
+    <meta name="description" content="A glass rod floating over a canvas, as a small WebGL shader. Lens, peak, drift, fringe and blur, with sliders." />
+    <link rel="stylesheet" href="demo/demo.css" />
+    <style>
+      main {
+        padding: 6vh 0 80px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(36px, 6vw, 72px);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+
+      .lead {
+        max-width: 620px;
+        margin: 0 0 32px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        border-radius: 20px;
+        background: #0b0b0b;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px 24px;
+        align-items: end;
+        margin-top: 20px;
+        color: var(--muted);
+      }
+
+      .controls label {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px;
+      }
+
+      .controls input {
+        grid-column: 1 / -1;
+        width: 100%;
+        accent-color: var(--accent);
+      }
+
+      .controls output {
+        color: var(--fg);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .controls button {
+        justify-self: start;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--fg);
+        padding: 8px 16px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .controls button[aria-pressed='true'] {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topbar mono" aria-label="Demos">
+        <span>Glass Refraction</span>
+        <span><a href="./">Scroll edge</a> · <a href="rod.html" aria-current="page">Glass rod</a></span>
+      </nav>
+
+      <main>
+        <h1>Glass Rod</h1>
+        <p class="lead">The same idea as the scroll edge, as a small WebGL shader. It cycles through settings on its own, now and then an extreme one. Move a slider to take over, Auto starts the loop again.</p>
+
+        <canvas role="img" aria-label="Animated demo: the words Glass Refraction under a slowly moving glass rod"></canvas>
+        <div class="controls mono" data-controls></div>
+      </main>
+    </div>
+
+    <script type="module">
+      import { createGlassRod } from './src/glass-rod.js'
+
+      const canvas = document.querySelector('canvas')
+      const host = document.querySelector('[data-controls]')
+      const defs = [
+        { key: 'lens', label: 'Lens', min: 1, max: 3.5, step: 0.01, show: (v) => `${v.toFixed(2)}×` },
+        { key: 'peak', label: 'Peak', min: 0, max: 100, step: 1, show: (v) => `${Math.round(v)}%` },
+        { key: 'drift', label: 'Drift', min: 0, max: 6, step: 0.1, show: (v) => `${v.toFixed(1)}%` },
+        { key: 'fringe', label: 'Fringe', min: 0, max: 12, step: 0.1, show: (v) => `${v.toFixed(1)}%` },
+        { key: 'blur', label: 'Blur', min: 0, max: 100, step: 1, show: (v) => `${Math.round(v)}%` },
+      ]
+      const ui = new Map()
+      for (const d of defs) {
+        const label = document.createElement('label')
+        const name = document.createElement('span')
+        name.textContent = d.label
+        const out = document.createElement('output')
+        const input = Object.assign(document.createElement('input'), { type: 'range', min: d.min, max: d.max, step: d.step })
+        label.append(name, out, input)
+        host.append(label)
+        ui.set(d.key, { input, out, d })
+      }
+      const auto = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Auto' })
+      auto.setAttribute('aria-pressed', 'true')
+      host.append(auto)
+
+      // Sliders in friendly units ↔ shader parameters.
+      const toUi = (p) => ({ lens: 1 / p.magnify, peak: p.peak * 100, drift: p.drift * 100, fringe: p.fringe * 100, blur: p.blur * 100 })
+      const fromUi = (v) => ({ magnify: 1 / v.lens, peak: v.peak / 100, drift: v.drift / 100, fringe: v.fringe / 100, blur: v.blur / 100 })
+      const read = () => Object.fromEntries([...ui].map(([k, { input }]) => [k, Number(input.value)]))
+
+      let manual = false
+      let last = ''
+      const show = (values) => {
+        for (const [k, { input, out, d }] of ui) {
+          if (!manual) input.value = values[k]
+          out.textContent = d.show(values[k])
+        }
+      }
+
+      await document.fonts.ready
+      const rod = createGlassRod(canvas, {
+        fontFamily: getComputedStyle(document.documentElement).fontFamily,
+        onParams: (p) => {
+          const values = manual ? read() : toUi(p)
+          const key = JSON.stringify(values)
+          if (key !== last) show(values), (last = key)
+        },
+      })
+
+      host.addEventListener('input', () => {
+        manual = true
+        auto.setAttribute('aria-pressed', 'false')
+        rod.setParams(fromUi(read()))
+        show(read())
+      })
+      auto.addEventListener('click', () => {
+        manual = false
+        auto.setAttribute('aria-pressed', 'true')
+        rod.setParams(null)
+      })
+      show(toUi(rod.current()))
+    </script>
+  </body>
+</html>

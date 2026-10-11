@@ -1,0 +1,171 @@
+/* Shared styles for the two demo pages. Plain CSS, no build step. */
+
+:root {
+  --bg: #0d0d0d;
+  --fg: #f4f0ea;
+  --muted: rgb(244 240 234 / 0.6);
+  --line: rgb(244 240 234 / 0.14);
+  --accent: #dffd02;
+  --panel: rgb(20 20 20 / 0.86);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  color: var(--muted);
+}
+
+.topbar a {
+  text-decoration: none;
+}
+
+.topbar a:hover,
+.topbar a[aria-current='page'] {
+  color: var(--accent);
+}
+
+/* --- Settings panel ------------------------------------------------------- */
+
+.panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  font-size: 13px;
+}
+
+.panel summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.panel summary::after {
+  content: '+';
+  font-size: 16px;
+}
+
+.panel[open] summary::after {
+  content: '−';
+}
+
+.panel-body {
+  display: grid;
+  gap: 14px;
+  padding: 0 16px 16px;
+}
+
+.panel label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.panel label input[type='range'] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.panel output {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.panel button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  padding: 6px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.panel button:hover,
+.panel button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #000;
+}
+
+.panel .toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+}
+
+.panel .note {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.panel hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 2px 0;
+}
+
+[hidden] {
+  display: none !important;
+}
